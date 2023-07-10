@@ -14,6 +14,8 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 import { Container, GamesContainer, Genres, Input } from './styles'
+import { useAuthContext } from '../contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 export default function Games() {
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false)
@@ -21,6 +23,9 @@ export default function Games() {
   const [query, setQuery] = useState('')
   const [games, setGames] = useState<GameDTO[]>([])
   const [gamesByGenre, setGamesByGenre] = useState<GameDTO[]>([])
+
+  const { user } = useAuthContext()
+  const router = useRouter()
 
   async function fetchData() {
     try {
@@ -72,6 +77,11 @@ export default function Games() {
     const filteredGames = games.filter((game) => game.title.toLowerCase().includes(query.toLowerCase()))
     setGamesByGenre(filteredGames)
   }
+
+  useEffect(() => {
+    console.log(user)
+    if (user === null) router.push('/')
+  }, [user])
 
   useEffect(() => {
     fetchDataByGenre()

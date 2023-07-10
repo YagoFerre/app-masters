@@ -17,7 +17,7 @@ export const Content = styled('div', {
   display: 'flex',
   width: '100%',
 
-  marginTop: '$10',
+  padding: '$10 0',
 
   justifyContent: 'center',
   alignItems: 'center',
@@ -35,42 +35,33 @@ export const Box = styled('div', {
   },
 })
 
-export const Title = styled('h1', {
-  color: '$gray100',
-  fontSize: '3rem',
-  fontWeight: '$bold',
-  lineHeight: '$shorter',
-})
-
-export const Subtitle = styled('p', {
+export const Title = styled('p', {
   color: '#F2F5FF',
-  fontSize: '$lg',
+  fontSize: '$xl',
   fontWeight: '$regular',
   lineHeight: '$base',
-
-  marginTop: '$4',
 })
 
 export const Button = styled('button', {
-  padding: '$4',
-  backgroundColor: '$gray100',
+  padding: '$2',
+  backgroundColor: '$blue100',
   border: '1px solid transparent',
 
-  color: '$blue100',
+  width: '100%',
+
+  color: '$white',
   fontSize: '$md',
-  fontWeight: '$bold',
+  fontWeight: '$regular',
 
-  marginTop: '$6',
-
-  '&:hover': {
-    backgroundColor: '$blue100',
-    color: '$gray100',
-    border: '1px solid $gray100',
+  '&:hover:not([disabled])': {
+    backgroundColor: '$gray100',
+    color: '$blue100',
+    border: '1px solid $blue100',
   },
 
   '&:disabled': {
     opacity: 0.7,
-    cursor: 'not-allowed',
+    cursor: 'default',
   },
 })
 
@@ -78,4 +69,87 @@ export const ImageBox = styled('div', {
   '@media only screen and (max-width: 768px)': {
     display: 'none',
   },
+})
+
+export const ButtonVisitor = styled('button', {
+  padding: '$2',
+  backgroundColor: '$gray100',
+  border: '1px solid $blue100',
+
+  width: '100%',
+
+  color: '$blue100',
+  fontSize: '$md',
+  fontWeight: '$regular',
+
+  '&:hover:not([disabled])': {
+    backgroundColor: '$blue100',
+    color: '$gray100',
+    border: '1px solid transparent',
+  },
+
+  '&:disabled': {
+    opacity: 0.7,
+    cursor: 'default',
+  },
+})
+
+export const Form = styled('form', {
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'column',
+  padding: '$8',
+
+  backgroundColor: '$white',
+
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  gap: '$6',
+
+  borderRadius: '1rem',
+})
+
+export const BoxSignIn = styled('div', {
+  display: 'flex',
+  gap: '$3',
+  alignItems: 'center',
+})
+
+export const SignInText = styled('p', {
+  color: '$gray300',
+  fontSize: '$lg',
+  fontWeight: '$regular',
+  lineHeight: '$short',
+})
+
+export const InputBox = styled('div', {
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  gap: '$4',
+})
+
+export const CreateAccount = styled('p', {
+  display: 'flex',
+  width: '100%',
+  color: '$black',
+  fontWeight: '$regular',
+  justifyContent: 'center',
+
+  a: {
+    marginLeft: '$1',
+    textDecoration: 'none',
+    color: '$blue100',
+    fontWeight: '$bold',
+  },
+})
+
+export const ButtonBox = styled('div', {
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  gap: '$2',
 })
