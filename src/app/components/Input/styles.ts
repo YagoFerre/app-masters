@@ -9,7 +9,7 @@ export const Box = styled('div', {
 })
 
 export const Label = styled('label', {
-  color: '$black',
+  color: '$gray100',
   fontSize: '$sm',
   fontWeight: '$bold',
 
@@ -22,18 +22,25 @@ export const Label = styled('label', {
 export const InputText = styled('input', {
   display: 'flex',
   width: '100%',
-  padding: '$4',
+  padding: '$3 $4',
 
-  color: '$black',
+  backgroundColor: '$gray300',
+
+  color: '$white',
   fontSize: '$sm',
   fontWeight: '$regular',
 
-  borderRadius: '0.75rem',
-  border: '1px solid $gray400',
+  borderRadius: '6px',
+  border: '1px solid $gray200',
+
+  '&::placeholder': {
+    color: '$gray100',
+  },
 
   '&:focus': {
     outline: 0,
-    borderColor: '$blue100',
+    transition: '0.5s ease',
+    borderColor: '$purple100',
   },
 })
 

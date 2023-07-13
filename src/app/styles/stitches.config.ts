@@ -41,11 +41,17 @@ export const { styled, getCssText, globalCss } = createStitches({
       black: '#000000',
 
       blue100: '#1D42CF',
+      purple100: '#A782E9',
 
-      gray100: '#FAFAFA',
-      gray200: '#566384',
-      gray300: '#1F2F59',
-      gray400: '#E5E7E9  ',
+      red100: '#FD5646',
+      green100: '#29b474',
+
+      gray100: '#DBDADA',
+      gray200: '#282B3F',
+      gray300: '#1F2534',
+      gray400: '#212635',
+      gray500: '#1B222E',
+      gray600: '#232839',
     },
   },
 })

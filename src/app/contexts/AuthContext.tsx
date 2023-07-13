@@ -35,7 +35,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       setLoading(false)
     })
 
-    return unsubscribe()
+    return () => unsubscribe()
   }, [])
 
   return (

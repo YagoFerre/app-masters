@@ -9,11 +9,11 @@ export const ContentBox = styled('div', {
 export const Line = styled('div', {
   display: 'flex',
   width: '100%',
-  borderTop: 'thin solid $gray300',
+  borderTop: 'thin solid $gray200',
 })
 
 export const OrText = styled('span', {
-  color: '$gray300',
+  color: '$gray100',
   fontSize: '$sm',
   fontWeight: '$regular',
   lineHeight: '$short',

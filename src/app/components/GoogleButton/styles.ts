@@ -4,7 +4,7 @@ export const Container = styled('button', {
   display: 'flex',
   width: '100%',
 
-  backgroundColor: '$gray400',
+  backgroundColor: '$gray100',
 
   padding: '$2',
   justifyContent: 'center',
@@ -13,13 +13,14 @@ export const Container = styled('button', {
 
   color: '$black',
   fontSize: '$md',
-  fontWeight: '500',
+  fontWeight: '$regular',
 
   border: '1px solid transparent',
 
   '&:hover:not([disabled])': {
-    backgroundColor: '$gray100',
-    border: '1px solid $gray400',
+    backgroundColor: '$gray400',
+    border: '1px solid $gray600',
+    color: '$white',
   },
 
   '&:disabled': {

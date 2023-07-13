@@ -11,9 +11,9 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
-import background from '../assets/background1.png'
+import backgroundImage from '../assets/background2.jpg'
+import logo from '../assets/logo.png'
 
-import { UserCircle } from '@phosphor-icons/react'
 import { Input } from '../components/Input'
 import { Separator } from '../components/Separator'
 import { GoogleButton } from '../components/GoogleButton'
@@ -25,19 +25,8 @@ import { signUp } from '../firebase/auth/signup'
 import { signInWithGoogle } from '../firebase/auth/signInWithGoogle'
 import { AppError } from '../utils/AppError'
 
-import {
-  Button,
-  Container,
-  Content,
-  Form,
-  FormBox,
-  ImageBox,
-  InputBox,
-  SignInText,
-  SignUpBox,
-  SignUpText,
-  Title,
-} from './styles'
+import { BoxLogo, ButtonBox, Container, CreateAccount, Form, InputBox, LogoText } from './styles'
+import { Button } from '../components/Button'
 
 const signUpFormSchema = yup.object({
   name: yup.string().required('O nome é obrigatório'),
@@ -92,56 +81,52 @@ export default function SignUp() {
 
   return (
     <Container>
-      <Content>
-        <ImageBox>
-          <Image src={background} alt="Background do Sign Up" quality={100} width={400} />
-        </ImageBox>
+      <Image src={backgroundImage} alt="Background da home" quality={100} fill style={{ objectFit: 'cover' }} />
 
-        <FormBox>
-          <Title>Crie sua conta</Title>
-          <Form onSubmit={handleSubmit(handleSignUp)}>
-            <SignUpBox>
-              <UserCircle size={32} color="#000" weight="fill" />
-              <SignUpText>Sign Up</SignUpText>
-            </SignUpBox>
+      <Form onSubmit={handleSubmit(handleSignUp)}>
+        <BoxLogo>
+          <Image src={logo} alt="Logo" quality={100} width={40} />
+          <LogoText>AppGame</LogoText>
+        </BoxLogo>
 
-            <InputBox>
-              <Input
-                label="Nome completo"
-                placeholder="Digite seu nome completo"
-                {...register('name')}
-                error={errors.name?.message}
-              />
-              <Input
-                label="E-mail"
-                placeholder="Digite seu e-mail"
-                type="email"
-                {...register('email')}
-                error={errors.email?.message}
-              />
-              <Input
-                label="Senha"
-                placeholder="Digite sua senha"
-                type="password"
-                {...register('password')}
-                error={errors.password?.message}
-              />
-            </InputBox>
+        <InputBox>
+          <Input
+            label="Nome"
+            placeholder="Digite seu nome completo"
+            {...register('name')}
+            error={errors.name?.message}
+          />
 
-            <Button type="submit" disabled={isSubmitting}>
-              Criar
-            </Button>
+          <Input
+            label="E-mail"
+            type="email"
+            placeholder="Digite seu e-mail"
+            {...register('email')}
+            error={errors.email?.message}
+          />
 
-            <SignInText>
-              Já tem uma conta? <Link href="/">Entrar</Link>
-            </SignInText>
+          <Input
+            label="Senha"
+            type="password"
+            placeholder="Digite sua senha"
+            {...register('password')}
+            error={errors.password?.message}
+          />
+        </InputBox>
 
-            <Separator />
+        <ButtonBox>
+          <Button type="submit" title="criar" disabled={isSubmitting} />
+        </ButtonBox>
 
-            <GoogleButton type="button" onClick={handleSignInWithGoogle} disabled={isLoading} />
-          </Form>
-        </FormBox>
-      </Content>
+        <CreateAccount>
+          Já tem uma conta?<Link href="/">Log In</Link>
+        </CreateAccount>
+
+        <Separator />
+
+        <GoogleButton type="button" onClick={handleSignInWithGoogle} disabled={isLoading} />
+      </Form>
+
       <ToastContainer />
     </Container>
   )

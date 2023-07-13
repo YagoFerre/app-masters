@@ -3,34 +3,115 @@ import { styled } from '../styles/stitches.config'
 export const Container = styled('main', {
   display: 'flex',
   flexDirection: 'column',
-  width: '100%',
-  maxWidth: '70rem',
 
   padding: '$1 0 $5',
   margin: '0 auto',
 })
 
-export const Genres = styled('section', {
+export const Header = styled('div', {
   display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-around',
+
+  padding: '$3 $1',
+  borderBottom: '1px solid $gray200',
+})
+
+export const SearchFilterContainer = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
   width: '100%',
+  maxWidth: '30rem',
 
-  padding: '$4 0',
-  gap: '$3',
+  backgroundColor: '$gray300',
+  border: '1px solid $gray200',
+  borderRadius: '6px',
 
-  justifyContent: 'center',
+  padding: '$2',
 
-  '@media screen and (max-width: 630px)': {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr',
-    maxWidth: '10rem',
-    margin: '0 auto',
+  select: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    border: 'none',
+    borderRadius: '6px',
+
+    padding: '0 $4',
+
+    color: '$gray100',
+    fontSize: '$sm',
+    fontWeight: '$regular',
+
+    cursor: 'pointer',
+    appearance: 'none',
+
+    '&:focus': {
+      outline: 0,
+    },
+
+    option: {
+      color: '$black',
+    },
   },
 
-  '@media screen and (max-width: 425px) and (max-width: 375px)': {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr ',
-    maxWidth: '10rem',
-    margin: '0 auto',
+  button: {
+    display: 'flex',
+
+    background: 'transparent',
+
+    padding: '$1 $3',
+
+    borderLeft: '1px solid $gray200',
+    borderRadius: 0,
+  },
+})
+
+export const Input = styled('input', {
+  width: '50%',
+  backgroundColor: 'transparent',
+  border: 'none',
+
+  padding: '$1',
+
+  color: '$gray100',
+  fontSize: '$sm',
+  fontWeight: '$regular',
+
+  borderRight: '1px solid $gray200',
+
+  '&::placeholder': {
+    color: '$gray100',
+  },
+
+  '&:focus': {
+    outline: 0,
+  },
+})
+
+export const FavoriteButton = styled('button', {
+  display: 'flex',
+  maxWidth: '9rem',
+  width: '100%',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '$3',
+  padding: '$2',
+
+  backgroundColor: '$gray300',
+  border: '1px solid $gray200',
+
+  color: '$white',
+  fontSize: '$xs',
+  fontWeight: '$bold',
+  lineHeight: '$base',
+  textTransform: 'uppercase',
+
+  '&:hover:not([disabled])': {
+    backgroundColor: '$gray600',
+  },
+
+  '&:disabled': {
+    opacity: 0.7,
+    cursor: 'default',
   },
 })
 
@@ -47,42 +128,5 @@ export const GamesContainer = styled('div', {
 
   '@media screen and (max-width: 425px)': {
     gridTemplateColumns: '1fr',
-  },
-})
-
-export const Input = styled('input', {
-  width: '100%',
-  maxWidth: '20rem',
-  padding: '$3',
-  backgroundColor: 'transparent',
-  border: '1px solid $blue100',
-  borderRadius: '6px',
-
-  margin: '$3 0 0 4.3rem',
-
-  color: '$gray100',
-  fontSize: '$sm',
-  fontWeight: '$regular',
-
-  '&::placeholder': {
-    color: '$gray100',
-  },
-
-  '&:focus': {
-    outline: 0,
-    borderColor: '$gray100',
-  },
-
-  '&:not(input:focus)': {
-    borderColor: '$gray100',
-  },
-
-  '@media screen and (max-width: 425px)': {
-    margin: '$3 0 0 2rem',
-  },
-
-  '@media screen and (max-width: 375px)': {
-    maxWidth: '15rem',
-    margin: '0 auto',
   },
 })

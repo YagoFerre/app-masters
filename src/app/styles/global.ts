@@ -8,11 +8,9 @@ export const globalStyles = globalCss({
   },
 
   body: {
-    backgroundColor: '$blue100',
-    color: '$gray200',
+    backgroundColor: '$gray500',
+    color: '$gray100',
     '-webkit-font-smoothing': 'antialiased',
-
-    fontFamily: 'Roboto, sans-serif',
   },
 
   button: {

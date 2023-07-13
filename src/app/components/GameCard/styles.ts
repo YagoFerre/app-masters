@@ -1,70 +1,139 @@
 import { styled } from '@/app/styles/stitches.config'
 
-import Link from 'next/link'
-
-export const Container = styled(Link, {
+export const Container = styled('div', {
   display: 'flex',
-  maxWidth: '20rem',
-  width: '100%',
   flexDirection: 'column',
 
-  gap: '$2',
-  padding: '$3',
+  width: '18.563rem',
 
-  background: '$gray100',
+  background: '$gray500',
+  border: '1px solid $gray200',
   borderRadius: '6px',
 
-  transition: '0.3s',
-  textDecoration: 'none',
-  cursor: 'pointer',
-
-  '&:hover': {
-    backgroundColor: '$gray400',
-  },
-
   '@media only screen and (max-width: 630px)': {
-    maxWidth: '15rem',
+    // maxWidth: '15rem',
   },
-})
-
-export const InfoBox = styled('div', {
-  display: 'flex',
-  width: '100%',
-  flex: 1,
-  flexDirection: 'column',
-})
-
-export const GameTitle = styled('span', {
-  color: '$blue100',
-  fontSize: '$md',
-  fontWeight: '$bold',
-  lineHeight: '$base',
-})
-
-export const GameDescription = styled('p', {
-  color: '$gray300',
-  fontSize: '$sm',
-  fontWeight: '$bold',
-  lineHeight: '$shorter',
-
-  textAlign: 'left',
-})
-
-export const Developer = styled('p', {
-  color: '$gray200',
-  fontSize: '$sm',
-  fontWeight: '$bold',
 })
 
 export const ImageBox = styled('div', {
   position: 'relative',
-  width: '18.563rem',
+  // width: '18.563rem',
   height: '12.5rem',
   objectFit: 'cover',
-  overflow: 'hidden',
+})
 
-  '@media only screen and (max-width: 630px)': {
-    width: '13.5rem',
-    height: '7.25rem',
+export const InfoBox = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '$3 $4',
+  gap: '$2',
+})
+
+export const GameTitle = styled('span', {
+  color: '$white',
+  fontSize: '$sm',
+  fontWeight: '$bold',
+  lineHeight: '$base',
+})
+
+export const Developer = styled('p', {
+  color: '$gray100',
+  fontSize: '$xs',
+  fontWeight: '$bold',
+})
+
+export const RatingStars = styled('div', {
+  display: 'flex',
+  gap: '$1',
+})
+
+export const RatingContainer = styled('div', {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+
+  marginTop: '$3',
+})
+
+export const FavoriteButton = styled('button', {
+  display: 'flex',
+  padding: '$2',
+
+  backgroundColor: '$gray300',
+  border: '1px solid $gray200',
+  justifyContent: 'center',
+
+  svg: {
+    color: '$purple100',
+  },
+
+  '&:hover:not([disabled])': {
+    backgroundColor: '$gray600',
+
+    svg: {
+      color: '$red100',
+    },
+  },
+
+  '&:disabled': {
+    opacity: 0.7,
+    cursor: 'default',
+  },
+})
+
+export const ButtonContainer = styled('div', {
+  display: 'flex',
+  gap: '$5',
+})
+
+export const RateButton = styled('button', {
+  display: 'flex',
+  padding: '$1',
+  borderRadius: '6px',
+  backgroundColor: '$green100',
+
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  color: '$white',
+  fontSize: '$xs',
+  fontWeight: '$regular',
+  lineHeight: '$shorter',
+  textTransform: 'uppercase',
+
+  '&:hover:not([disabled])': {
+    backgroundColor: '$purple100',
+  },
+
+  '&:disabled': {
+    opacity: 0.7,
+    cursor: 'default',
+  },
+})
+
+export const ResetButton = styled('button', {
+  display: 'flex',
+  gap: '$1',
+  padding: '$1',
+
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: '1px solid $gray200',
+  borderRadius: '6px',
+  backgroundColor: '$gray300',
+
+  color: '$white',
+  fontSize: '$xs',
+  fontWeight: '$regular',
+  lineHeight: '$shorter',
+  textTransform: 'uppercase',
+
+  '&:hover:not([disabled])': {
+    backgroundColor: '$gray600',
+  },
+
+  '&:disabled': {
+    opacity: 0.7,
+    cursor: 'default',
   },
 })
