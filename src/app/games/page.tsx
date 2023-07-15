@@ -12,17 +12,31 @@ import { api } from '../lib/axios'
 import { AppError } from '../utils/AppError'
 import { GameDTO } from '../dtos/GamesDTO'
 
-import { Heart, MagnifyingGlass } from '@phosphor-icons/react'
+import { getDatabase, ref, get, update } from 'firebase/database'
+
+import { Heart, MagnifyingGlass, Star, XCircle } from '@phosphor-icons/react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-import { Container, FavoriteButton, GamesContainer, Header, Input, SearchFilterContainer } from './styles'
-import { getDatabase, ref, set, update, onValue, query, orderByChild, get, child } from 'firebase/database'
+import {
+  ButtonHeaderContainer,
+  Container,
+  FavoriteButton,
+  GamesContainer,
+  Header,
+  Input,
+  MostRatedButton,
+  NotFound,
+  NotFoundText,
+  SearchFilterContainer,
+} from './styles'
 
 export default function Games() {
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false)
-  const [tagSelected, setTagSelected] = useState('Todos')
-  const [queryy, setQuery] = useState('')
+  const [tagSelected, setTagSelected] = useState('')
+  const [queryText, setQueryText] = useState('')
+  const [isFavorite, setIsFavorite] = useState<boolean>(false)
+  const [orderByStars, setOrderByStars] = useState<'asc' | 'desc'>('asc')
   const [games, setGames] = useState<GameDTO[]>([])
   const [gamesByGenre, setGamesByGenre] = useState<GameDTO[]>([])
 
@@ -74,39 +88,100 @@ export default function Games() {
   }
 
   async function fetchFavoriteGames() {
-    // const dbRef = ref(getDatabase())
-    // const response = await get(child(dbRef, `user/${user?.uid}/postId/`))
-    // const favoriteValue = response.val()
-    // console.log(favoriteValue)
-    const responseGames = games.map((data) => {
-      const dbRef = getDatabase()
-      const response = query(
-        ref(dbRef, 'user/' + user?.uid + '/postId/' + data.id + '/favorite'),
-        orderByChild(`favorite`),
-      )
+    const db = getDatabase()
 
-      return {
-        ...data,
-        favorite: response,
-      }
-    })
+    const newGame = await Promise.all(
+      gamesByGenre.map(async (game) => {
+        const favoritesRef = ref(db, 'user/' + user?.uid + '/games' + `/${game.id}` + '/favorites')
+        const snapshot = await get(favoritesRef)
+        const data = snapshot.val()
 
-    console.log(responseGames)
+        if (data === null) {
+          update(favoritesRef, {
+            id: game.id,
+            favorite: false,
+          })
+        }
+
+        update(favoritesRef, {
+          favorite: data.favorite,
+        })
+
+        return {
+          ...game,
+          favorite: data.favorite,
+        }
+      }),
+    )
+
+    const favoriteGames = newGame.filter((game) => game.favorite === true)
+
+    if (!isFavorite) {
+      return gamesByGenre
+    }
+
+    setGamesByGenre(favoriteGames)
   }
 
   function filterGames() {
-    const filteredGames = gamesByGenre.filter((game) => game.title.toLowerCase().includes(queryy.toLowerCase()))
+    const filteredGames = games.filter((game) => {
+      if (tagSelected === 'Todos') {
+        return game.title.toLowerCase().includes(queryText.toLowerCase())
+      }
+
+      return game.title.toLowerCase().includes(queryText.toLowerCase()) && game.genre.includes(tagSelected)
+    })
+
     setGamesByGenre(filteredGames)
   }
 
+  async function sortGamesByStars() {
+    const db = getDatabase()
+
+    const newGame = await Promise.all(
+      gamesByGenre.map(async (game) => {
+        const starsRef = ref(db, 'user/' + user?.uid + '/games' + `/${game.id}` + '/stars')
+        const snapshot = await get(starsRef)
+        const data = snapshot.val()
+
+        if (data === null) {
+          update(starsRef, {
+            id: game.id,
+            rate: 0,
+          })
+        }
+
+        update(starsRef, {
+          rate: data.rate,
+        })
+
+        return {
+          ...game,
+          rate: data.rate,
+        }
+      }),
+    )
+
+    const sortedGames = [...newGame].sort((a, b) => {
+      if (orderByStars === 'asc') {
+        return a.rate - b.rate
+      } else {
+        return b.rate - a.rate
+      }
+    })
+
+    const mostRated = sortedGames.filter((game) => game !== undefined)
+
+    setGamesByGenre(mostRated)
+  }
+
   useEffect(() => {
-    console.log(user)
     if (user === null) router.push('/')
   }, [user])
 
   useEffect(() => {
     fetchDataByGenre()
-  }, [tagSelected])
+  }, [tagSelected, isFavorite])
 
   useEffect(() => {
     fetchData()
@@ -114,13 +189,21 @@ export default function Games() {
 
   useEffect(() => {
     filterGames()
-  }, [queryy])
+  }, [queryText])
+
+  useEffect(() => {
+    fetchFavoriteGames()
+  }, [isFavorite])
+
+  useEffect(() => {
+    sortGamesByStars()
+  }, [orderByStars])
 
   return (
     <Container>
       <Header>
         <SearchFilterContainer>
-          <Input placeholder="Procurar jogo..." value={queryy} onChange={(e) => setQuery(e.target.value)} />
+          <Input placeholder="Procurar jogo..." value={queryText} onChange={(e) => setQueryText(e.target.value)} />
           <select value={tagSelected} onChange={(e) => setTagSelected(e.target.value)}>
             <option value="Todos">Todos</option>
             <option value="Shooter">Shooter</option>
@@ -142,15 +225,30 @@ export default function Games() {
           </button>
         </SearchFilterContainer>
 
-        <FavoriteButton onClick={fetchFavoriteGames}>
-          <Heart size={18} color="#A782E9" />
-          favoritos
-        </FavoriteButton>
+        <ButtonHeaderContainer>
+          <FavoriteButton onClick={() => setIsFavorite(!isFavorite)} disabled={user?.isAnonymous === true}>
+            <Heart size={18} color="#A782E9" />
+            favoritos
+          </FavoriteButton>
+
+          <MostRatedButton onClick={() => setOrderByStars(orderByStars === 'asc' ? 'desc' : 'asc')}>
+            <Star size={18} color="#C29931" weight="regular" />
+            {orderByStars === 'asc' ? 'Menores' : 'Maiores'}
+          </MostRatedButton>
+        </ButtonHeaderContainer>
       </Header>
 
       <GamesContainer>
         {isLoadingData ? <Loading /> : gamesByGenre.map((game) => <GameCard key={game.id} data={game} />)}
       </GamesContainer>
+
+      {gamesByGenre.length === 0 && (
+        <NotFound>
+          <XCircle size={20} color="#FD5646" />
+          <NotFoundText>Oops, o jogo não existe ou não foi encontrado.</NotFoundText>
+        </NotFound>
+      )}
+
       <ToastContainer />
     </Container>
   )

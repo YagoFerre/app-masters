@@ -91,9 +91,9 @@ export const FavoriteButton = styled('button', {
   display: 'flex',
   maxWidth: '9rem',
   width: '100%',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'center',
-  gap: '$3',
+  gap: '$1',
   padding: '$2',
 
   backgroundColor: '$gray300',
@@ -128,5 +128,55 @@ export const GamesContainer = styled('div', {
 
   '@media screen and (max-width: 425px)': {
     gridTemplateColumns: '1fr',
+  },
+})
+
+export const NotFound = styled('div', {
+  display: 'flex',
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  margin: '$10 0 0 0',
+  gap: '$2',
+})
+
+export const NotFoundText = styled('p', {
+  color: '$gray100',
+  fontSize: '$md',
+  fontWeight: '$regular',
+  lineHeight: '$base',
+})
+
+export const ButtonHeaderContainer = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '$3',
+})
+
+export const MostRatedButton = styled('button', {
+  display: 'flex',
+  maxWidth: '9rem',
+  width: '100%',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  gap: '$1',
+  padding: '$2',
+
+  backgroundColor: '$gray300',
+  border: '1px solid $gray200',
+
+  color: '$white',
+  fontSize: '$xs',
+  fontWeight: '$bold',
+  lineHeight: '$base',
+  textTransform: 'uppercase',
+
+  '&:hover:not([disabled])': {
+    backgroundColor: '$gray600',
+  },
+
+  '&:disabled': {
+    opacity: 0.7,
+    cursor: 'default',
   },
 })

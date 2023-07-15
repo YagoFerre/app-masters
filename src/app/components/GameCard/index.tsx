@@ -11,7 +11,7 @@ import { GameDTO } from '@/app/dtos/GamesDTO'
 
 import { Star, Heart, X } from '@phosphor-icons/react'
 
-import { getDatabase, ref, set, update, onValue, query, orderByChild } from 'firebase/database'
+import { getDatabase, ref, update, onValue } from 'firebase/database'
 
 import {
   ButtonContainer,
@@ -32,8 +32,8 @@ interface Props {
 }
 
 export function GameCard({ data }: Props) {
-  const [rate, setRate] = useState<number | null>(null)
-  const [favorite, setFavorite] = useState<boolean | undefined>(undefined)
+  const [rate, setRate] = useState<number>(0)
+  const [favorite, setFavorite] = useState<boolean>(false)
 
   const { user } = useAuthContext()
   const router = useRouter()
@@ -44,10 +44,11 @@ export function GameCard({ data }: Props) {
     }
 
     const db = getDatabase()
-    const reference = ref(db, 'user/' + user?.uid + '/postId/' + data.id + '/stars')
+    const reference = ref(db, 'user/' + user?.uid + '/games' + `/${data.id}` + '/stars')
 
-    set(reference, {
-      rate: rate!,
+    update(reference, {
+      id: data.id,
+      rate,
     })
   }
 
@@ -57,9 +58,10 @@ export function GameCard({ data }: Props) {
     }
 
     const db = getDatabase()
-    const reference = ref(db, 'user/' + user?.uid + '/postId/' + data.id + '/favorite')
+    const reference = ref(db, 'user/' + user?.uid + '/games' + `/${data.id}` + '/favorites')
 
     update(reference, {
+      id: data.id,
       favorite: !favorite,
     })
 
@@ -68,11 +70,8 @@ export function GameCard({ data }: Props) {
 
   function fetchRatings() {
     const db = getDatabase()
-    const rateRef = query(ref(db, 'user/' + user?.uid + '/postId/' + data.id + '/stars'), orderByChild(`${user?.uid}`))
-    const favoriteRef = query(
-      ref(db, 'user/' + user?.uid + '/postId/' + data.id + '/favorite'),
-      orderByChild(`${user?.uid}`),
-    )
+    const rateRef = ref(db, 'user/' + user?.uid + '/games' + `/${data.id}` + '/stars')
+    const favoriteRef = ref(db, 'user/' + user?.uid + '/games' + `/${data.id}` + '/favorites')
 
     onValue(rateRef, (snapshot) => {
       const rateValue = snapshot.val()
@@ -85,8 +84,8 @@ export function GameCard({ data }: Props) {
     onValue(favoriteRef, (snapshot) => {
       const favoriteValue = snapshot.val()
 
-      if (favoriteValue !== undefined) {
-        setFavorite(favoriteValue)
+      if (favoriteValue !== null) {
+        setFavorite(favoriteValue.favorite)
       }
     })
   }
@@ -134,7 +133,7 @@ export function GameCard({ data }: Props) {
 
         <ButtonContainer>
           <RateButton onClick={writeRate}>avaliar</RateButton>
-          <ResetButton onClick={() => setRate(null)}>
+          <ResetButton onClick={() => setRate(0)}>
             <X size={15} color="#A782E9" />
             limpar
           </ResetButton>

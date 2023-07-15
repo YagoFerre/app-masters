@@ -64,7 +64,7 @@ export const FavoriteButton = styled('button', {
   justifyContent: 'center',
 
   svg: {
-    color: '$purple100',
+    color: '$red100',
   },
 
   '&:hover:not([disabled])': {
