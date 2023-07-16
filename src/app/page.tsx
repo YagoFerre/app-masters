@@ -1,149 +1,247 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import Link from 'next/link'
-import Image from 'next/image'
+import { GameCard } from './components/GameCard'
 
+import { useAuthContext } from '../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 
-import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import Loading from './loading'
+import { api } from '../lib/axios'
+import { AppError } from '../utils/AppError'
+import { GameDTO } from '../dtos/GamesDTO'
 
-import { Input } from './components/Input'
-import { Separator } from './components/Separator'
-import { GoogleButton } from './components/GoogleButton'
+import { getDatabase, ref, get } from 'firebase/database'
 
-import backgroundImage from '@/app/assets/background2.jpg'
-import logo from '@/app/assets/logo.png'
-
+import { Heart, MagnifyingGlass, Star, XCircle } from '@phosphor-icons/react'
+import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { toast, ToastContainer } from 'react-toastify'
 
-import { AppError } from './utils/AppError'
-import { signIn } from './firebase/auth/signin'
-import { signInWithVisitor } from './firebase/auth/signInAnonymously'
-import { signInWithGoogle } from './firebase/auth/signInWithGoogle'
+import {
+  ButtonHeaderContainer,
+  Container,
+  FavoriteButton,
+  GamesContainer,
+  Header,
+  Input,
+  MostRatedButton,
+  NotFound,
+  NotFoundText,
+  SearchFilterContainer,
+} from './styles'
 
-import { BoxLogo, ButtonBox, Container, CreateAccount, Form, InputBox, LogoText } from './styles'
-import { Button } from './components/Button'
+export default function Games() {
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(false)
+  const [isFavorite, setIsFavorite] = useState<boolean>(false)
+  const [tagSelected, setTagSelected] = useState('')
+  const [queryText, setQueryText] = useState('')
+  const [orderByStars, setOrderByStars] = useState<'asc' | 'desc'>('asc')
+  const [games, setGames] = useState<GameDTO[]>([])
+  const [gamesByGenre, setGamesByGenre] = useState<GameDTO[]>([])
 
-const signInFormSchema = yup.object({
-  email: yup.string().email().required('Digite seu e-mail'),
-  password: yup.string().required('Digite sua senha'),
-})
-
-type SignInFormData = yup.InferType<typeof signInFormSchema>
-
-export default function Home() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SignInFormData>({
-    resolver: yupResolver(signInFormSchema),
-  })
-
-  const [isLoading, setIsLoading] = useState(false)
-
+  const { user } = useAuthContext()
   const router = useRouter()
 
-  async function handleSignIn(data: SignInFormData) {
+  async function fetchData() {
     try {
-      await signIn(data.email, data.password)
+      setIsLoadingData(true)
+      const response = await api.get('/data')
 
-      return router.push('/games')
+      if (response.request.timeout > 5000) {
+        setIsLoadingData(false)
+        return toast.error('O servidor demorou para responder, tente mais tarde.')
+      }
+
+      setGames(response.data)
+      setGamesByGenre(response.data)
+      setIsLoadingData(false)
     } catch (error) {
+      setIsLoadingData(false)
       const isAppError = error instanceof AppError
-      const title = isAppError ? error?.message : 'Não foi possível conectar o usuário.'
+      const title = isAppError ? error?.message : 'Erro ao carregar dados.'
 
       return toast.error(title)
     }
   }
 
-  async function handleSignInWithVisitor() {
-    try {
-      setIsLoading(true)
-      await signInWithVisitor()
+  function fetchDataByGenre() {
+    const genreFilters: { [key: string]: (game: GameDTO) => boolean } = {
+      Shooter: (game: GameDTO) => game.genre === 'Shooter',
+      MMOARPG: (game: GameDTO) => game.genre === 'MMOARPG',
+      ARPG: (game: GameDTO) => game.genre === 'ARPG',
+      Fighting: (game: GameDTO) => game.genre === 'Fighting',
+      'Action RPG': (game: GameDTO) => game.genre === 'Shooter',
+      'Battle Royale': (game: GameDTO) => game.genre === 'Battle Royale',
+      MMORPG: (game: GameDTO) => game.genre === 'MMORPG',
+      MOBA: (game: GameDTO) => game.genre === 'MOBA',
+      Sports: (game: GameDTO) => game.genre === 'Sports',
+      Racing: (game: GameDTO) => game.genre === 'Racing',
+      'Card Game': (game: GameDTO) => game.genre === 'Card Game',
+      Strategy: (game: GameDTO) => game.genre === 'Shooter',
+      MMO: (game: GameDTO) => game.genre === 'MMO',
+    }
 
-      return router.push('/games')
+    const filterFunction = genreFilters[tagSelected] || (() => true)
+    const filteredGames = games.filter(filterFunction)
+    setGamesByGenre(filteredGames)
+  }
+
+  async function fetchFavoriteGames() {
+    try {
+      const db = getDatabase()
+
+      const newGame = await Promise.all(
+        gamesByGenre.map(async (game) => {
+          const favoritesRef = ref(db, 'user/' + user?.uid + '/games' + `/${game.id}` + '/favorites')
+          const snapshot = await get(favoritesRef)
+          const data = snapshot.val()
+
+          return {
+            ...game,
+            favorite: data.favorite,
+          }
+        }),
+      )
+
+      const favoriteGames = newGame.filter((game) => game.favorite === true)
+
+      if (!isFavorite) {
+        return gamesByGenre
+      }
+
+      setGamesByGenre(favoriteGames)
     } catch (error) {
-      setIsLoading(false)
       const isAppError = error instanceof AppError
-      const title = isAppError ? error?.message : 'Não foi possível conectar o usuário.'
+      const title = isAppError ? error?.message : 'Erro ao carregar jogos favoritos.'
 
       return toast.error(title)
-    } finally {
-      setIsLoading(false)
     }
   }
 
-  async function handleSignInWithGoogle() {
-    try {
-      setIsLoading(true)
-      await signInWithGoogle()
+  function filterGames() {
+    const filteredGames = games.filter((game) => {
+      if (tagSelected === 'Todos') {
+        return game.title.toLowerCase().includes(queryText.toLowerCase())
+      }
 
-      return router.push('/games')
+      return game.title.toLowerCase().includes(queryText.toLowerCase()) && game.genre.includes(tagSelected)
+    })
+
+    setGamesByGenre(filteredGames)
+  }
+
+  async function sortGamesByStars() {
+    try {
+      const db = getDatabase()
+
+      const newGame = await Promise.all(
+        gamesByGenre.map(async (game) => {
+          const starsRef = ref(db, 'user/' + user?.uid + '/games' + `/${game.id}` + '/stars')
+          const snapshot = await get(starsRef)
+          const data = snapshot.val()
+
+          return {
+            ...game,
+            rate: data.rate,
+          }
+        }),
+      )
+
+      const sortedGames = [...newGame].sort((a, b) => {
+        if (orderByStars === 'asc') {
+          return a.rate - b.rate
+        } else {
+          return b.rate - a.rate
+        }
+      })
+
+      const mostRated = sortedGames.filter((game) => game !== undefined)
+      setGamesByGenre(mostRated)
     } catch (error) {
-      setIsLoading(false)
       const isAppError = error instanceof AppError
-      const title = isAppError ? error?.message : 'Não foi possível conectar o usuário.'
+      const title = isAppError ? error?.message : 'Não há nenhum jogo avaliado.'
 
       return toast.error(title)
-    } finally {
-      setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (user === null) router.push('/auth/signin')
+  }, [user])
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    fetchDataByGenre()
+  }, [tagSelected, isFavorite])
+
+  useEffect(() => {
+    filterGames()
+  }, [queryText])
+
+  useEffect(() => {
+    fetchFavoriteGames()
+  }, [isFavorite])
+
+  useEffect(() => {
+    sortGamesByStars()
+  }, [orderByStars])
 
   return (
     <Container>
-      <Image src={backgroundImage} alt="Background da home" quality={100} fill style={{ objectFit: 'cover' }} />
+      <Header>
+        <SearchFilterContainer>
+          <Input placeholder="Procurar jogo..." value={queryText} onChange={(e) => setQueryText(e.target.value)} />
+          <select value={tagSelected} onChange={(e) => setTagSelected(e.target.value)}>
+            <option value="Todos">Todos</option>
+            <option value="Shooter">Shooter</option>
+            <option value="MMOARPG">MMOARPG</option>
+            <option value="ARPG">ARPG</option>
+            <option value="Fighting">Fighting</option>
+            <option value="Action RPG">Action RPG</option>
+            <option value="Battle Royale">Battle Royale</option>
+            <option value="MMORPG">MMORPG</option>
+            <option value="MOBA">MOBA</option>
+            <option value="Sports">Sports</option>
+            <option value="Racing">Racing</option>
+            <option value="Card Game">Card Game</option>
+            <option value="Strategy">Strategy</option>
+            <option value="MMO">MMO</option>
+          </select>
+          <button>
+            <MagnifyingGlass size={18} color="#A782E9" />
+          </button>
+        </SearchFilterContainer>
 
-      <Form onSubmit={handleSubmit(handleSignIn)}>
-        <BoxLogo>
-          <Image src={logo} alt="Logo" quality={100} width={40} />
-          <LogoText>AppGame</LogoText>
-        </BoxLogo>
+        <ButtonHeaderContainer>
+          <FavoriteButton onClick={() => setIsFavorite(!isFavorite)} disabled={user?.isAnonymous === true}>
+            <Heart size={18} color="#A782E9" />
+            favoritos
+          </FavoriteButton>
 
-        <InputBox>
-          <Input
-            label="E-mail"
-            type="email"
-            placeholder="Digite seu e-mail"
-            {...register('email')}
-            error={errors.email?.message}
-          />
+          <MostRatedButton
+            onClick={() => setOrderByStars(orderByStars === 'asc' ? 'desc' : 'asc')}
+            disabled={user?.isAnonymous === true}
+          >
+            <Star size={18} color="#C29931" weight="regular" />
+            {orderByStars === 'asc' ? 'Menores' : 'Maiores'}
+          </MostRatedButton>
+        </ButtonHeaderContainer>
+      </Header>
 
-          <Input
-            label="Senha"
-            type="password"
-            placeholder="Digite sua senha"
-            {...register('password')}
-            error={errors.password?.message}
-          />
-        </InputBox>
+      {!isLoadingData && gamesByGenre.length === 0 && (
+        <NotFound>
+          <XCircle size={20} color="#FD5646" />
+          <NotFoundText>Oops, o jogo não foi encontrado, atualize a página.</NotFoundText>
+        </NotFound>
+      )}
 
-        <ButtonBox>
-          <Button type="submit" title="começar" disabled={isSubmitting} />
-
-          <Button
-            type="button"
-            outline
-            title="entrar como visitante"
-            onClick={handleSignInWithVisitor}
-            disabled={isLoading}
-          />
-        </ButtonBox>
-
-        <CreateAccount>
-          Não tem uma conta?<Link href="/signup">Criar conta</Link>
-        </CreateAccount>
-
-        <Separator />
-
-        <GoogleButton type="button" onClick={handleSignInWithGoogle} disabled={isLoading} />
-      </Form>
+      <GamesContainer>
+        {isLoadingData ? <Loading /> : gamesByGenre.map((game) => <GameCard key={game.id} data={game} />)}
+      </GamesContainer>
 
       <ToastContainer />
     </Container>

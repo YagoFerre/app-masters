@@ -32,4 +32,8 @@ export const Container = styled('button', {
       },
     },
   },
+
+  '@media screen and (max-width: 280px)': {
+    padding: '$1',
+  },
 })

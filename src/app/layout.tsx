@@ -1,12 +1,15 @@
 import { ReactNode } from 'react'
 import { Inter } from 'next/font/google'
-import { AuthContextProvider } from './contexts/AuthContext'
+import { Metadata } from 'next'
+import { AuthContextProvider } from '../contexts/AuthContext'
 
 import StitchesRegistry from './registry'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'App Game',
-  icon: '/app.png',
+  icons: {
+    icon: '/app.png',
+  },
 }
 
 const inter = Inter({

@@ -6,8 +6,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { useAuthContext } from '@/app/contexts/AuthContext'
-import { GameDTO } from '@/app/dtos/GamesDTO'
+import { useAuthContext } from '@/contexts/AuthContext'
+import { GameDTO } from '@/dtos/GamesDTO'
 
 import { Star, Heart, X } from '@phosphor-icons/react'
 
@@ -40,7 +40,7 @@ export function GameCard({ data }: Props) {
 
   function writeRate() {
     if (user?.isAnonymous === true) {
-      return router.push('/')
+      return router.push('/auth/signin')
     }
 
     const db = getDatabase()
@@ -54,7 +54,7 @@ export function GameCard({ data }: Props) {
 
   function writeFavorite() {
     if (user?.isAnonymous === true) {
-      return router.push('/')
+      return router.push('/auth/signin')
     }
 
     const db = getDatabase()
@@ -76,6 +76,13 @@ export function GameCard({ data }: Props) {
     onValue(rateRef, (snapshot) => {
       const rateValue = snapshot.val()
 
+      if (rateValue === null) {
+        update(rateRef, {
+          id: data.id,
+          rate: 0,
+        })
+      }
+
       if (rateValue !== null) {
         setRate(rateValue.rate)
       }
@@ -83,6 +90,13 @@ export function GameCard({ data }: Props) {
 
     onValue(favoriteRef, (snapshot) => {
       const favoriteValue = snapshot.val()
+
+      if (favoriteValue === null) {
+        update(favoriteRef, {
+          id: data.id,
+          favorite: false,
+        })
+      }
 
       if (favoriteValue !== null) {
         setFavorite(favoriteValue.favorite)

@@ -1,4 +1,4 @@
-import { styled } from '../styles/stitches.config'
+import { styled } from '../../styles/stitches.config'
 
 export const Container = styled('div', {
   flex: 1,
@@ -31,6 +31,18 @@ export const Form = styled('form', {
   gap: '$4',
 
   borderRadius: '6px',
+
+  '@media screen and (max-width: 425px)': {
+    width: '20rem',
+    height: '32.5rem',
+    gap: '$3',
+  },
+
+  '@media screen and (max-width: 280px)': {
+    width: '15rem',
+    height: '27.5rem',
+    gap: '$2',
+  },
 })
 
 export const BoxLogo = styled('div', {
@@ -44,6 +56,10 @@ export const LogoText = styled('p', {
   fontSize: '$lg',
   fontWeight: '$regular',
   lineHeight: '$short',
+
+  '@media screen and (max-width: 280px)': {
+    fontSize: '$md',
+  },
 })
 
 export const InputBox = styled('div', {

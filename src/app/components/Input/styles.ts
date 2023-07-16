@@ -17,6 +17,10 @@ export const Label = styled('label', {
     content: '*',
     color: 'red',
   },
+
+  '@media screen and (max-width: 280px)': {
+    fontSize: '$xs',
+  },
 })
 
 export const InputText = styled('input', {
@@ -41,6 +45,10 @@ export const InputText = styled('input', {
     outline: 0,
     transition: '0.5s ease',
     borderColor: '$purple100',
+  },
+
+  '@media screen and (max-width: 280px)': {
+    padding: '$1 $2',
   },
 })
 

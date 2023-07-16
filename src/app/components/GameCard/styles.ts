@@ -1,4 +1,5 @@
 import { styled } from '@/app/styles/stitches.config'
+import { keyframes } from '@stitches/react'
 
 export const Container = styled('div', {
   display: 'flex',
@@ -55,6 +56,12 @@ export const RatingContainer = styled('div', {
   marginTop: '$3',
 })
 
+const scaleUp = keyframes({
+  '0%': { transform: 'scale(1)' },
+  '50%': { transform: 'scale(1.2)' },
+  '100%': { transform: 'scale(1.5)' },
+})
+
 export const FavoriteButton = styled('button', {
   display: 'flex',
   padding: '$2',
@@ -67,9 +74,14 @@ export const FavoriteButton = styled('button', {
     color: '$red100',
   },
 
+  '&:active': {
+    svg: {
+      animation: `${scaleUp} 100ms`,
+    },
+  },
+
   '&:hover:not([disabled])': {
     backgroundColor: '$gray600',
-
     svg: {
       color: '$red100',
     },

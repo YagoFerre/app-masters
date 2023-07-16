@@ -11,52 +11,67 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
-import backgroundImage from '../assets/background2.jpg'
-import logo from '../assets/logo.png'
+import { Input } from '../../components/Input'
+import { Separator } from '../../components/Separator'
+import { GoogleButton } from '../../components/GoogleButton'
 
-import { Input } from '../components/Input'
-import { Separator } from '../components/Separator'
-import { GoogleButton } from '../components/GoogleButton'
+import backgroundImage from '../../../assets/background2.jpg'
+import logo from '../../../assets/logo.png'
 
 import 'react-toastify/dist/ReactToastify.css'
 import { toast, ToastContainer } from 'react-toastify'
 
-import { signUp } from '../firebase/auth/signup'
-import { signInWithGoogle } from '../firebase/auth/signInWithGoogle'
-import { AppError } from '../utils/AppError'
+import { AppError } from '../../../utils/AppError'
+import { signIn } from '../../firebase/auth/signin'
+import { signInWithVisitor } from '../../firebase/auth/signInAnonymously'
+import { signInWithGoogle } from '../../firebase/auth/signInWithGoogle'
 
 import { BoxLogo, ButtonBox, Container, CreateAccount, Form, InputBox, LogoText } from './styles'
-import { Button } from '../components/Button'
+import { Button } from '../../components/Button'
 
-const signUpFormSchema = yup.object({
-  name: yup.string().required('O nome é obrigatório'),
-  email: yup.string().email().required('O e-mail é obrigatório'),
-  password: yup.string().required('A senha é obrigatório'),
+const signInFormSchema = yup.object({
+  email: yup.string().email().required('Digite seu e-mail'),
+  password: yup.string().required('Digite sua senha'),
 })
 
-type SignUpFormData = yup.InferType<typeof signUpFormSchema>
+type SignInFormData = yup.InferType<typeof signInFormSchema>
 
-export default function SignUp() {
+export default function SignIn() {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpFormData>({
-    resolver: yupResolver(signUpFormSchema),
+  } = useForm<SignInFormData>({
+    resolver: yupResolver(signInFormSchema),
   })
 
   const [isLoading, setIsLoading] = useState(false)
 
   const router = useRouter()
 
-  async function handleSignUp(data: SignUpFormData) {
+  async function handleSignIn(data: SignInFormData) {
     try {
-      await signUp(data.email, data.password)
+      await signIn(data.email, data.password)
 
-      return router.push('/games')
+      return router.push('/')
     } catch (error) {
       const isAppError = error instanceof AppError
-      const title = isAppError ? error?.message : 'Erro ao criar conta.'
+      const title = isAppError ? error?.message : 'Não foi possível conectar o usuário.'
+
+      return toast.error(title)
+    }
+  }
+
+  async function handleSignInWithVisitor() {
+    try {
+      setIsLoading(true)
+      await signInWithVisitor()
+
+      return router.push('/')
+    } catch (error) {
+      setIsLoading(false)
+      const isAppError = error instanceof AppError
+      const title = isAppError ? error?.message : 'Não foi possível conectar o usuário.'
 
       return toast.error(title)
     }
@@ -67,11 +82,11 @@ export default function SignUp() {
       setIsLoading(true)
       await signInWithGoogle()
 
-      return router.push('/games')
+      return router.push('/')
     } catch (error) {
       setIsLoading(false)
       const isAppError = error instanceof AppError
-      const title = isAppError ? error?.message : 'Erro ao criar conta.'
+      const title = isAppError ? error?.message : 'Não foi possível conectar o usuário.'
 
       return toast.error(title)
     } finally {
@@ -83,20 +98,13 @@ export default function SignUp() {
     <Container>
       <Image src={backgroundImage} alt="Background da home" quality={100} fill style={{ objectFit: 'cover' }} />
 
-      <Form onSubmit={handleSubmit(handleSignUp)}>
+      <Form onSubmit={handleSubmit(handleSignIn)}>
         <BoxLogo>
           <Image src={logo} alt="Logo" quality={100} width={40} />
           <LogoText>AppGame</LogoText>
         </BoxLogo>
 
         <InputBox>
-          <Input
-            label="Nome"
-            placeholder="Digite seu nome completo"
-            {...register('name')}
-            error={errors.name?.message}
-          />
-
           <Input
             label="E-mail"
             type="email"
@@ -115,11 +123,19 @@ export default function SignUp() {
         </InputBox>
 
         <ButtonBox>
-          <Button type="submit" title="criar" disabled={isSubmitting} />
+          <Button type="submit" title="começar" disabled={isSubmitting} />
+
+          <Button
+            type="button"
+            outline
+            title="entrar como visitante"
+            onClick={handleSignInWithVisitor}
+            disabled={isLoading}
+          />
         </ButtonBox>
 
         <CreateAccount>
-          Já tem uma conta?<Link href="/">Log In</Link>
+          Não tem uma conta?<Link href="/auth/signup">Criar conta</Link>
         </CreateAccount>
 
         <Separator />

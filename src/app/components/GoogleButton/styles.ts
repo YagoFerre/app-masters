@@ -27,4 +27,9 @@ export const Container = styled('button', {
     opacity: 0.7,
     cursor: 'default',
   },
+
+  '@media screen and (max-width: 280px)': {
+    fontSize: '$sm',
+    padding: '$1',
+  },
 })

@@ -4,7 +4,7 @@
 
 import { ReactNode, createContext, useEffect, useContext, useState } from 'react'
 import { onAuthStateChanged, getAuth, User } from 'firebase/auth'
-import { app } from '../firebase/config'
+import { app } from '../app/firebase/config'
 
 export interface AuthContextDataProps {
   user: User | null
